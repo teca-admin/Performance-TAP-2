@@ -20,7 +20,7 @@ interface DashboardGeralProps {
   totalRecords?: number;
 }
 
-type ContractType = 'geral' | 'ahl' | 'ohd' | 'rampa' | 'limpeza';
+type ContractType = 'geral';
 type FlightFilterType = 'all' | 'perfect' | 'failed';
 
 interface MetricMeta {
@@ -107,11 +107,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
   const [selectedYear, setSelectedYear] = useState<number>(availableYears.includes(new Date().getFullYear()) ? new Date().getFullYear() : availableYears[0]);
 
   const groups = {
-    geral: { start: 0, count: 14, color: '#004181' },
-    ahl: { start: 14, count: 3, color: '#0c343d' },
-    ohd: { start: 17, count: 2, color: '#fb394e' },
-    rampa: { start: 19, count: 7, color: '#3c78d8' },
-    limpeza: { start: 26, count: 3, color: '#fbbc04' }
+    geral: { start: 0, count: 14, color: '#004181' }
   };
 
   const contractHeaders = useMemo(() => {
@@ -293,7 +289,6 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
       };
 
       const perfAberturaValue = calcTimeEfficiency(checkinAbertura, targetAbertura);
-      // Fix: Provided missing second argument and used correct variable names to fix reference error.
       const perfFechamentoValue = calcTimeEfficiency(checkinFechamento, targetFechamento);
       const perfEmbarqueValue = calcTimeEfficiency(embarqueInicio, targetEmbarque);
       const perfUltimoPaxValue = calcTimeEfficiency(lastPaxMin, targetPax);
@@ -332,7 +327,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
     return {
       totalFlights: flightsCount,
       potentialFlights: potentialCount,
-      flightsWith100Sla: flightsWith100SlaCount,
+      flightsWith100SlaCount,
       flightsBelowSla: flightsCount - flightsWith100SlaCount,
       totalPax,
       totalBags,
@@ -581,7 +576,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
               >
                 <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: (groups as any)[id].color }}></div>
                 <span className="text-[11px] font-black uppercase tracking-tight">
-                  {id === 'geral' ? '1. GERAL' : id === 'ahl' ? '2. AHL' : id === 'ohd' ? '3. OHD' : id === 'rampa' ? '4. RAMPA' : '5. LIMPEZA'}
+                  1. GERAL
                 </span>
               </button>
             ))}
@@ -610,7 +605,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
               />
               <StatCard 
                 title="Atingido" 
-                value={performance.flightsWith100Sla} 
+                value={performance.flightsWith100SlaCount} 
                 icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>} 
                 onClick={() => handleCardFilter('perfect')}
                 isActive={flightListFilter === 'perfect'}
@@ -633,7 +628,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
                 <div className="flex items-center justify-between mb-8">
                   <div>
                     <h3 className="text-[14px] font-black text-slate-800 uppercase tracking-tight">Consolidado Mensal: Média de Performance</h3>
-                    <p className="text-[11px] text-slate-400 font-bold uppercase mt-1">Média do Percentual de Atingimento vs Meta Individualizada</p>
+                    <p className="text-[11px] text-slate-400 font-bold uppercase mt-1">Média do Percentual de Atendimento vs Meta Individualizada</p>
                   </div>
                   <div className="flex items-center gap-4">
                      <div className="flex items-center gap-2">
@@ -643,7 +638,6 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
                   </div>
                 </div>
                 
-                {/* GRÁFICO PRINCIPAL COM MARGENS CONTROLADAS E EIXO Y OCULTO */}
                 <div className="h-[300px] outline-none" style={{ outline: 'none' }} tabIndex={-1}>
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={slaData} margin={{ top: 25, right: 0, left: 0, bottom: 0 }}>
@@ -673,7 +667,6 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
                   </ResponsiveContainer>
                 </div>
 
-                {/* TABELA DE GAP ANALYSIS - ALINHADA PERFEITAMENTE COM AS BARRAS ATRAVÉS DE GRID */}
                 <div className="mt-8 border-t border-slate-50 pt-6 grid grid-cols-5">
                   {slaData.map((item, idx) => {
                     const gap = (item.realizado - item.meta).toFixed(1);
@@ -686,7 +679,7 @@ const DashboardGeral: React.FC<DashboardGeralProps> = ({ data, headers, totalRec
                           {isPositive ? (
                             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>
                           ) : (
-                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" /></svg>
                           )}
                         </div>
                         <div className="flex flex-col">
